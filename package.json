@@ -1,7 +1,8 @@
 {
   "name": "abit-color",
   "version": "1.0.0",
-  "description": "",
+  "license": "MIT",
+  "description": "Ever wanted to own a color? Now you can",
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {

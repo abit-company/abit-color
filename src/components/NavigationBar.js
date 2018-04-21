@@ -30,7 +30,13 @@ const MetaMaskStatus = styled.div`
 
 const NavBar = ({ metaMask, userAddress }) => (
   <Nav>
-    <Logo>Abitcolor</Logo>
+    <Logo>
+      abit<span style={{ color: "#845EC2" }}>c</span>
+      <span style={{ color: "#D65DB1" }}>o</span>
+      <span style={{ color: "#FF6F91" }}>l</span>
+      <span style={{ color: "#FF9671" }}>o</span>
+      <span style={{ color: "#FFC75F" }}>r</span>
+    </Logo>
     <div className="rightBox">
       {metaMask === "notAvailable" && (
         <p>
@@ -39,7 +45,7 @@ const NavBar = ({ metaMask, userAddress }) => (
       )}
       {metaMask === "onTestNetwork" && <p>You are on a test net</p>}
       {metaMask === "locked" && <p>Your account is locked</p>}
-      {metaMask === "logged" && <p>{userAddress}</p>}
+      {metaMask === "logged" && <UserAddress>{userAddress}</UserAddress>}
       <MetaMaskStatus value={metaMask} />
     </div>
   </Nav>
@@ -58,6 +64,8 @@ const Nav = styled.nav`
   }
 `;
 
-const Logo = styled.h1``;
+const Logo = styled.h1`
+  letter-spacing: 0.1em;
+`;
 
 const UserAddress = styled.p``;

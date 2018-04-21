@@ -1,23 +1,20 @@
-import "normalizr";
 import React from "react";
 import { render } from "react-dom";
-import { injectGlobal } from "styled-components";
-import MetaMask from "./MetaMask";
-import NavigationBar from "./NavigationBar";
+import registerServiceWorker from "./registerServiceWorker";
+import App from "./App";
 
-injectGlobal`
-  * {
-    padding: 0;
-    margin: 0;
+const rootElement = document.getElementById("root");
+
+if (rootElement) {
+  render(<App />, rootElement);
+
+  if (module.hot) {
+    // $FlowFixMe
+    module.hot.accept("./App", () => {
+      render(<App />, rootElement);
+    });
   }
-`;
-
-const App = () => (
-  <MetaMask.Provider>
-    <div>
-      <NavigationBar />
-    </div>
-  </MetaMask.Provider>
-);
-
-render(<App />, document.getElementById("root"));
+  registerServiceWorker();
+} else {
+  throw new Error("Missing React App root element");
+}

@@ -37,11 +37,6 @@ class Provider extends Component {
       "CHECK_METAMASK",
       extendedState
     );
-    console.log(
-      "extendedState, metamaskstate",
-      extendedState,
-      this.metaMaskState.value
-    );
     this.setState(prevState => ({
       context: {
         metaMask: this.metaMaskState.value,
