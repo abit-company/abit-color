@@ -3,11 +3,11 @@ import styled from "styled-components";
 import MetaMask from "./MetaMask";
 
 const metaMaskStatusColors = {
-  loading: "gray",
-  notAvailable: "red",
-  onTestNetwork: "brown",
-  logged: "green",
-  locked: "yellow"
+  loading: "#B0A8B9",
+  notAvailable: "#FF6F91",
+  onTestNetwork: "#926C00",
+  logged: "#00C9A7",
+  locked: "#FF9671"
 };
 
 export default () => (
