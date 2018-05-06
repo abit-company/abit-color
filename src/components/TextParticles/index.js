@@ -5,8 +5,8 @@ import Particle from "./Particle";
 
 type Props = {
   children: string,
+  className: string,
   colors: string[],
-  fontSize: number,
   fontFamily: string,
   gravity: number,
   duration: number,
@@ -16,10 +16,19 @@ type Props = {
 };
 
 type State = {
-  width: ?number
+  width: number,
+  height: number,
+  fontSize: number
+};
+
+type Size = {
+  width: number,
+  height: number
 };
 
 const fps = 60;
+
+const devicePixelRatio = window ? window.devicePixelRatio : 1;
 
 export default class TextParticles extends Component<Props, State> {
   static defaultProps = {
@@ -28,50 +37,66 @@ export default class TextParticles extends Component<Props, State> {
     fontSize: 120,
     fontFamily: "Arial",
     gravity: 0,
-    duration: 0.1,
-    speed: 0.01,
-    resolution: 3,
-    radius: 0.1
+    duration: 0.2,
+    speed: 0.03,
+    resolution: 4,
+    radius: 3
   };
 
   state = {
-    width: 180
+    width: 300,
+    height: 150,
+    fontSize: 14
   };
 
   canvasRef = createRef();
   particles = [];
 
-  get x() {
-    return 0;
+  get canvasFontSize() {
+    return this.props.fontSize * devicePixelRatio;
   }
 
-  get y() {
-    return this.props.fontSize * 3 / 4;
+  get canvasWidth() {
+    return this.state.width * devicePixelRatio;
   }
 
   componentDidMount() {
     const { current: canvas } = this.canvasRef;
     this.ctx = canvas.getContext("2d");
+    // const { width, height } = canvas.getBoundingClientRect();
     const width = this.getTextWidth();
+    // const fontSize = this.getFontSize({ width, height });
+    // console.log("height", this.props.children, height, fontSize);
     this.setState({ width }, () => {
       this.createParticles();
       this.update();
     });
   }
 
-  getTextWidth = () => {
-    const { children: text, fontSize, fontFamily } = this.props;
+  getFontSize = (size: Size): number => {
+    const { children: text, fontSize: fontSize0, fontFamily } = this.props;
     this.ctx.textAlign = "start";
-    this.ctx.font = `bold ${fontSize}px ${fontFamily}`;
+    this.ctx.font = `bold ${fontSize0}px ${fontFamily}`;
+    this.ctx.textBaseline = "hanging";
+    const { width: width0 } = this.ctx.measureText(text);
+    const m = width0 / text.length / fontSize0;
+    return Math.floor(size.width / (m * text.length));
+  };
+
+  getTextWidth = () => {
+    const { children: text, fontFamily } = this.props;
+    this.ctx.textAlign = "start";
+    this.ctx.font = `bold ${this.canvasFontSize}px ${fontFamily}`;
+    this.ctx.textBaseline = "hanging";
     const { width } = this.ctx.measureText(text);
-    return Math.ceil(width);
+    console.log("width is ", width);
+    return Math.ceil(width / devicePixelRatio);
   };
 
   createParticles = () => {
     const {
       children: text,
       colors,
-      fontSize,
       fontFamily,
       gravity,
       duration,
@@ -79,18 +104,22 @@ export default class TextParticles extends Component<Props, State> {
       resolution,
       radius
     } = this.props;
-    const { width } = this.state;
-
     this.ctx.textAlign = "start";
-    this.ctx.font = `bold ${fontSize}px ${fontFamily}`;
-    this.ctx.fillText(text, this.x, this.y);
-    const idata = this.ctx.getImageData(0, 0, width, fontSize);
+    this.ctx.font = `bold ${this.canvasFontSize}px ${fontFamily}`;
+    this.ctx.textBaseline = "hanging";
+    this.ctx.fillText(text, 0, 0);
+    const idata = this.ctx.getImageData(
+      0,
+      0,
+      this.canvasWidth,
+      this.canvasFontSize
+    );
     const buffer32 = new Uint32Array(idata.data.buffer);
 
     this.particles = [];
-    for (let y = 0; y < fontSize; y += resolution) {
-      for (let x = 0; x < width; x += resolution) {
-        if (buffer32[Math.round(y * width + x)]) {
+    for (let y = 0; y < this.canvasFontSize; y += resolution) {
+      for (let x = 0; x < this.canvasWidth; x += resolution) {
+        if (buffer32[Math.round(y * this.canvasWidth + x)]) {
           const color = colors[Math.floor(Math.random() * colors.length)];
           this.particles.push(
             new Particle(x, y, this.ctx, {
@@ -105,17 +134,15 @@ export default class TextParticles extends Component<Props, State> {
         }
       }
     }
-    this.ctx.clearRect(0, 0, width, fontSize);
+    this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasFontSize);
   };
 
   update = () => {
     setTimeout(() => {
-      this.ctx.clearRect(0, 0, this.state.width, this.props.fontSize);
-
+      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasFontSize);
       for (let i = 0; i < this.particles.length; i++) {
         this.particles[i].update();
       }
-
       requestAnimationFrame(this.update);
     }, 1000 / fps);
   };
@@ -123,12 +150,13 @@ export default class TextParticles extends Component<Props, State> {
   render() {
     return (
       <canvas
+        className={this.props.className}
         style={{
           height: this.props.fontSize,
           width: this.state.width
         }}
-        height={`${this.props.fontSize}`}
-        width={`${this.state.width}`}
+        height={this.canvasFontSize}
+        width={this.canvasWidth}
         ref={this.canvasRef}
       />
     );

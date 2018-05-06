@@ -92,7 +92,7 @@ export default class Particle {
       this.y = this.base[1];
       this.radius = 1.1;
       this.setSpeed(this.speed);
-      this.futurRadius = randomInt(this.radius, this.radius + 3);
+      this.futurRadius = randomInt(this.radius, this.radius + 5);
       this.setHeading(randomInt(degreesToRads(0), degreesToRads(360)));
     }
   };
